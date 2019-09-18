@@ -1,31 +1,23 @@
 package nitolmotors.sales.com.neverendingservice;
 
 import android.app.ActivityManager;
-import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.RetryPolicy;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import nitolmotors.sales.com.neverendingservice.CallLogService.ServiceCallLog;
+import nitolmotors.sales.com.neverendingservice.LocationService.ServiceLocation;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
-    Intent mServiceIntent;
-    private MyService mMyService;
+    Intent mServiceIntent_location;
+    private ServiceLocation mMyService_location;
 
+    Intent mServiceIntent_calllog;
+    private ServiceCallLog mMyService_calllog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,31 +25,52 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mMyService = new MyService();
-        mServiceIntent = new Intent(this, mMyService.getClass());
-        if (!isMyServiceRunning(mMyService.getClass())) {
-            startService(mServiceIntent);
+        // Start the location Service
+        mMyService_location = new ServiceLocation();
+        mServiceIntent_location = new Intent(this, mMyService_location.getClass());
+        if (!isMyLocationServiceRunning(mMyService_location.getClass())) {
+            startService(mServiceIntent_location);
+        }
+
+        // Start the Call log service
+        mMyService_calllog = new ServiceCallLog();
+        mServiceIntent_calllog = new Intent(this, mMyService_calllog.getClass());
+        if (!isMyCallLogServiceRunning(mMyService_calllog.getClass())) {
+            startService(mServiceIntent_calllog);
         }
     }
 
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        Log.i(TAG, "isMyServiceRunning: ");
+    private boolean isMyLocationServiceRunning(Class<?> serviceClass) {
+        Log.i(TAG, "isMyServiceRunning: Location");
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (serviceClass.getName().equals(service.service.getClassName())) {
-                Log.i ("Service status", "Running");
+                Log.i ("Location Service status", "Running");
                 return true;
             }
         }
-        Log.i ("Service status", "Not running");
+        Log.i ("Location Service status", "Not running");
         return false;
     }
 
+    private boolean isMyCallLogServiceRunning(Class<?> serviceClass) {
+        Log.i(TAG, "isMyServiceRunning: calllog");
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                Log.i ("Calllog Service status", "Running");
+                return true;
+            }
+        }
+        Log.i ("Calllog Service status", "Not running");
+        return false;
+    }
 
     @Override
     protected void onDestroy() {
-        Log.i(TAG, "onDestroy: ");
-        stopService(mServiceIntent);
+        Log.i(TAG, "onDestroy: MainActivity");
+        stopService(mServiceIntent_location);
+        stopService(mServiceIntent_calllog);
         super.onDestroy();
     }
 

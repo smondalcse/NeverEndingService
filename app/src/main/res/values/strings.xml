@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Never Ending Service</string>
+
+    <string name="notification_channel_calllog_ID">nitolmotors.sales.com.neverendingservice.calllog</string>
+    <string name="notification_channel_location_ID">nitolmotors.sales.com.neverendingservice.location</string>
+
 </resources>
